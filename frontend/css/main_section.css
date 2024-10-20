@@ -1,0 +1,19 @@
+@import url(./color.css);
+
+.main-section {
+  flex: 1;
+  display: flex;
+  flex-flow: column nowrap;
+  height: calc(100vh - 3rem);
+  overflow-y: auto;
+}
+
+.flex-column {
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.flex-row {
+  display: flex;
+  flex-flow: row nowrap;
+}

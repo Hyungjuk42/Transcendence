@@ -1,0 +1,13 @@
+# FROM elasticsearch:8.14.1
+FROM elasticsearch:7.17.22
+
+COPY --chmod=777 ./config/run.sh /
+COPY --chmod=777 ./config/elasticsearch.yml /usr/share/elasticsearch/elasticsearch.yml
+
+# RUN mkdir /usr/share/elasticsearch/certs
+
+# RUN /run.sh
+
+RUN ["/run.sh"]
+
+CMD ["/run.sh"]

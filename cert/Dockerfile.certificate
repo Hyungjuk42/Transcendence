@@ -1,0 +1,12 @@
+FROM ubuntu:latest
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+       ca-certificates \
+       openssl
+
+RUN mkdir -p /etc/ssl/certs
+COPY generate-certificate.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/generate-certificate.sh
+
+CMD ["/usr/local/bin/generate-certificate.sh"]

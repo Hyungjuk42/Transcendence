@@ -1,0 +1,27 @@
+.tournament #Bracket {
+  width: 100%;
+  display: none;
+}
+
+.tournament #Bracket.hide {
+  display: none;
+}
+
+.tournament #Bracket.show {
+  display: block;
+  z-index: 999;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.tournament #pong-game {
+  min-height: 10rem;
+}
+
+/* @media screen and (min-height: 800px) {
+  .tournament #Bracket {
+    display: block;
+  }
+} */

@@ -1,0 +1,163 @@
+@import url("./color.css");
+
+:root {
+  --bs-scrollbar-width: 0;
+}
+
+::-webkit-scrollbar {
+  width: var(--bs-scrollbar-width);
+}
+
+.user-list-with-btn {
+  height: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+#user-list-toggle {
+  z-index: 999;
+  @media screen and (max-width: 869px) {
+    position: fixed;
+    /* animation: move-right 0.5s; */
+    right: -16rem;
+  }
+}
+
+.user-list {
+  width: 16rem;
+  height: calc(100vh - 3rem);
+  background-color: var(--black);
+  border-left: 1px solid var(--white);
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: start;
+  align-items: start;
+  overflow-y: auto;
+}
+
+#user-list-toggle.active {
+  right: 0;
+  animation: move-left 0.5s;
+}
+
+@keyframes move-left {
+  from {
+    right: -16rem;
+  }
+  to {
+    right: 0;
+  }
+}
+
+@keyframes move-right {
+  from {
+    right: 0;
+  }
+  to {
+    right: -16rem;
+  }
+}
+
+.user-list-btn {
+  position: fixed;
+  right: 0;
+  bottom: 50%;
+  height: 2.5rem;
+  z-index: 997;
+  padding: 0 0.2rem;
+  border-radius: 50% 0 0 50%;
+  border: 1px solid var(--white);
+  border-right: 0;
+  display: none;
+  @media screen and (max-width: 869px) {
+    display: block;
+  }
+}
+
+.overlay {
+  position: fixed;
+  top: calc(3rem + 3px);
+  left: 0;
+  width: 100vw;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+  display: none;
+}
+
+.overlay.active {
+  display: block;
+  animation: fade-in 0.5s;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.user-item {
+  display: flex;
+  flex-flow: row nowrap;
+  margin-top: 1rem;
+  margin-left: 0.5rem;
+  align-items: center;
+  transition: transform 0.1s ease;
+}
+
+.user-item:hover {
+  z-index: 1;
+  transform: scale(1.03);
+}
+
+.user-item > .profile {
+  position: relative;
+}
+
+.user-item.sleep {
+  opacity: 0.3;
+}
+
+.user-item.sleep:hover {
+  opacity: 0.6;
+  transition: opacity 0.1s;
+}
+
+.user-item > .profile > img {
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: 1.5rem;
+  border: 2px solid var(--gray40);
+}
+
+.isloggedin.active {
+  position: absolute;
+  color: var(--green);
+  left: 2.3rem;
+  top: 2.3rem;
+}
+
+.isloggedin.sleep {
+  position: absolute;
+  color: var(--red);
+  left: 2.3rem;
+  top: 2.3rem;
+}
+
+.user-item > .user-info {
+  display: flex;
+  flex-flow: column nowrap;
+  margin-left: 0.5rem;
+}

@@ -1,0 +1,192 @@
+@import "./color.css";
+@import "./reset.css";
+
+.modal-content {
+  background-color: var(--primary-color);
+}
+
+.modal-header {
+  border: none;
+}
+
+.modal-footer {
+  border: none;
+}
+
+.modal-title {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-title-text {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+}
+
+.modal-title-text h3 {
+  margin-left: 0.875rem;
+}
+
+.modal h6 {
+  text-align: center;
+}
+
+.modal-title-close {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal img {
+  width: 1.875rem;
+  height: 1.875rem;
+}
+
+.modal .input {
+  margin-inline: 33px;
+  display: flex;
+  flex-direction: row;
+}
+
+.modal .input h6 {
+  width: 7rem;
+  text-align: left;
+}
+
+.modal .input input {
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid white;
+  margin-left: 0.875rem;
+  flex: 1;
+  color: white;
+}
+
+.modal .input input:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.radio-check {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.radio-check .form-check {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 11rem;
+  padding: 0.9375rem 0.625rem;
+}
+
+.body-element {
+  margin-bottom: 1rem;
+}
+
+.form-check input[type="radio"] {
+  display: none;
+}
+
+.form-check input[type="radio"] + label {
+  display: inline-block;
+  cursor: pointer;
+  height: 1.5rem;
+  width: 7rem;
+  line-height: 24px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.form-check input[type="radio"] + label {
+  background-color: transparent;
+  color: var(--gray40);
+}
+.form-check input[type="radio"]:checked + label {
+  background-color: var(--gray70);
+  color: #fff;
+  transition: 0.2s;
+}
+
+.form-check-label {
+  border-radius: 0.625rem;
+}
+
+.loader > span {
+  width: 3rem;
+  height: 3rem;
+  border: 5px solid #fff;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: pulse 1s linear infinite;
+  position: absolute;
+  top: 50vh;
+  left: 50%;
+  margin: -1.5rem 0 0 -1.5rem;
+}
+.loader > span:after {
+  content: "";
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  border: 5px solid #fff;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  animation: scaleUp 1s linear infinite;
+}
+
+@keyframes scaleUp {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+  }
+  60%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+@keyframes pulse {
+  0%,
+  60%,
+  100% {
+    transform: scale(1);
+  }
+  80% {
+    transform: scale(1.2);
+  }
+}
+
+.modal .user-item h6 {
+  text-align: left;
+}
+
+.denied {
+  display: none;
+  margin-inline: 33px;
+}
+
+.show {
+  display: block;
+}
+
+#lottie {
+  position: absolute;
+  top: 50vh;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10rem;
+  height: 10rem;
+  display: inline-block;
+  box-sizing: border-box;
+}

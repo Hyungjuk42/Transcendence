@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lobby Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        #createRoomButton, #matchmakingButton {
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #createRoomForm {
+            display: none;
+            background-color: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            width: 300px;
+        }
+        #createRoomForm h2 {
+            margin-top: 0;
+        }
+        #createRoomForm label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        #createRoomForm input,
+        #createRoomForm select,
+        #createRoomForm button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        #roomList {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 10px;
+            width: 100%;
+            max-width: 1200px;
+        }
+        .room {
+            background-color: white;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+        .room h3 {
+            margin-top: 0;
+            font-size: 16px;
+        }
+        .room p {
+            margin: 5px 0;
+        }
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 300px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Lobby Page</h1>
+    <button id="createRoomButton">방 만들기</button>
+    <button id="matchmakingButton">매치메이킹</button>
+
+    <!-- 방 만들기 옵션 폼 -->
+    <div id="createRoomForm">
+        <h2>방 만들기</h2>
+        <label for="roomName">방 이름:</label>
+        <input type="text" id="roomName" name="roomName" placeholder="방 이름을 입력하세요"><br>
+
+        <label for="roomMode">모드 선택:</label>
+        <select id="roomMode" name="roomMode">
+            <option value=2>1vs1</option>
+            <option value=4>Tournament</option>
+        </select><br>
+
+        <label for="isSecret">비밀방 여부:</label>
+        <input type="checkbox" id="isSecret" name="isSecret"><br>
+
+        <label for="password">비밀번호:</label>
+        <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요" disabled><br>
+
+        <button type="button" onclick="createRoom()">방 만들기</button>
+    </div>
+
+    <!-- 방 리스트 표시 -->
+    <div id="roomList"></div>
+
+    <!-- 비밀번호 입력 모달 -->
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>비밀번호 입력</h2>
+            <input type="password" id="modalPassword" placeholder="비밀번호를 입력하세요"><br>
+            <button type="button" onclick="sendPassword()">입장</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedRoomId = ''; // 수정된 부분: selectedRoomHost -> selectedRoomId
+
+        const socket = new WebSocket('ws://' + window.location.host + '/ws/lobby/');
+
+        socket.onopen = function(e) {
+            console.log("웹소켓 서버에 연결되었습니다.");
+        };
+
+        socket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            console.log("서버로부터 메시지를 받았습니다:", data);
+
+            if (data.type === 'room_list') {
+                updateRoomList(data.rooms);
+            } else if (data.type === 'room_created') {
+                window.location.href = '/api/room/' + data.room_id; // 수정된 부분: data.host -> data.room_id
+            } else if (data.type === 'password_required') {
+                selectedRoomId = data.room_id; // 수정된 부분: data.host -> data.room_id
+                document.getElementById('passwordModal').style.display = 'block';
+            } else if (data.type === 'join_approved') {
+                window.location.href = '/api/room/' + data.room_id; // 수정된 부분: data.host -> data.room_id
+            } else if (data.type === 'join_denied') {
+                alert(data.message);
+            } else if (data.type === 'matchmaking_waiting') {
+                alert("매치메이킹 대기 중...");
+            } else if (data.type === 'goto_matchmaking_game') {
+                window.location.href = '/api/game/' + data.room_id; // 수정된 부분: data.host -> data.room_id
+            }
+        };
+
+        socket.onclose = function(e) {
+            console.log("웹소켓 서버와 연결이 끊어졌습니다.");
+        };
+
+        socket.onerror = function(e) {
+            console.error("웹소켓 에러 발생:", e);
+        };
+
+        document.getElementById('createRoomButton').addEventListener('click', function() {
+            const form = document.getElementById('createRoomForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        });
+
+        document.getElementById('isSecret').addEventListener('change', function() {
+            const passwordField = document.getElementById('password');
+            if (this.checked) {
+                passwordField.disabled = false;
+            } else {
+                passwordField.disabled = true;
+                passwordField.value = '';
+            }
+        });
+
+        document.getElementById('matchmakingButton').addEventListener('click', function() {
+            const matchmakingData = {
+                'type': 'matchmaking'
+            };
+            console.log("매치메이킹 요청 전송:", matchmakingData);
+            socket.send(JSON.stringify(matchmakingData));
+        });
+
+        function createRoom() {
+            const roomName = document.getElementById('roomName').value;
+            const roomMode = document.getElementById('roomMode').value;
+            const isSecret = document.getElementById('isSecret').checked;
+            const password = document.getElementById('password').value;
+
+            const roomData = {
+                'type': 'create_room',
+                'room_name': roomName,
+                'mode': parseInt(roomMode),  // mode 값을 정수형으로 변환
+                'is_secret': isSecret,
+                'password': password
+            };
+
+            console.log("방 생성 정보 전송:", roomData);
+            socket.send(JSON.stringify(roomData));
+        }
+
+        function updateRoomList(rooms) {
+            const roomListDiv = document.getElementById('roomList');
+            roomListDiv.innerHTML = '';
+
+            rooms.forEach(room => {
+                const roomDiv = document.createElement('div');
+                roomDiv.className = 'room';
+                roomDiv.onclick = () => {
+                    const joinData = {
+                        'type': 'join_room',
+                        'room_id': room.room_id // 수정된 부분: 'host': room.host -> 'room_id': room.room_id
+                    };
+                    socket.send(JSON.stringify(joinData));
+                };
+                const playerCount = room.mode == 2 ? `${room.players.length}/2` : `${room.players.length}/4`; // mode에 따른 플레이어 수
+                const modeText = room.mode == 2 ? '1vs1' : 'Tournament'; // 모드 텍스트 변경
+                const roomInfo = `
+                    <h3>${room.room_name}${room.is_secret ? ' (secret)' : ''}</h3>
+                    <p>Room ID: ${room.room_id}</p> <!-- 수정된 부분: Host: ${room.host} -> Room ID: ${room.room_id} -->
+                    <p>Mode: ${modeText}</p>
+                    <p>Players: ${playerCount}</p>
+                `;
+                roomDiv.innerHTML = roomInfo;
+                roomListDiv.appendChild(roomDiv);
+            });
+        }
+
+        // 모달 닫기
+        document.querySelector('.close').onclick = function() {
+            document.getElementById('passwordModal').style.display = 'none';
+        };
+
+        function sendPassword() {
+            const password = document.getElementById('modalPassword').value;
+            const joinData = {
+                'type': 'join_secret_room',
+                'room_id': selectedRoomId, // 수정된 부분: 'host': selectedRoomHost -> 'room_id': selectedRoomId
+                'password': password
+            };
+            socket.send(JSON.stringify(joinData));
+        }
+
+        // 모달 외부 클릭 시 닫기
+        window.onclick = function(event) {
+            const modal = document.getElementById('passwordModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        };
+    </script>
+</body>
+</html>

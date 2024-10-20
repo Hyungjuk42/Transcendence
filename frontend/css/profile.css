@@ -1,0 +1,291 @@
+@import url(./color.css);
+
+.profile-img {
+  /* width: 40%;
+  max-width: 30rem; */
+  width: 15rem;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+}
+
+.profile-img > img {
+  width: 100%;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+  padding: 1rem;
+}
+
+.profile-img-btn {
+  width: 10rem;
+  height: 2rem;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  border-radius: 0.5rem;
+  padding-left: 1rem;
+}
+
+.profile-img-btn > img {
+  /* margin-right: 0.5rem; */
+  width: 1rem;
+  height: 1rem;
+}
+
+.follow-btn {
+  width: 7rem;
+  height: 2rem;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  border-radius: 0.5rem;
+  padding-left: 1rem;
+  /* margin: 0.5rem; */
+}
+
+.follow-btn > img {
+  /* margin-right: 0.5rem; */
+  width: 1rem;
+  height: 1rem;
+}
+
+.profile-main {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+  overflow-y: auto;
+}
+
+.profile-info {
+  padding: 2.5rem;
+}
+
+.profile-info > div > * {
+  display: inline-block;
+}
+
+.profile-info > div > p {
+  padding-left: 1rem;
+}
+
+.profile-info > p {
+  padding-top: 1rem;
+}
+
+.profile-log {
+  width: 100%;
+  flex: 1;
+  margin-bottom: 1rem;
+  height: 70%;
+  max-height: 70%;
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.profile-log > .select-bar {
+  height: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+  overflow-y: auto;
+}
+
+.profile-log > div > button {
+  width: 1.8rem;
+  height: 4rem;
+  border: 1px solid var(--white);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 1rem 0 0 0.2rem;
+}
+
+.profile-log > div > button.dashboardBtn {
+  height: 6.5rem;
+}
+
+.profile-log > div > button.selected {
+  background-color: var(--white);
+  color: var(--primary-color);
+}
+
+.vertical-text {
+  transform: rotate(-90deg);
+  display: inline-block;
+}
+
+.log-container {
+  flex: 1;
+  height: 100%;
+  padding-right: 1rem;
+  /* background-color: var(--gray50); */
+  border-radius: 0 0 0 1rem;
+  border-left: 2px solid var(--white);
+  display: flex;
+  /* justify-content: flex-end; */
+  flex-flow: column nowrap;
+  overflow-y: auto;
+}
+
+.log-container.detail {
+  padding-left: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.log-container.detail > h4 {
+  padding: 1rem 0;
+}
+
+.log-container.detail > canvas {
+  padding-bottom: 3rem;
+}
+
+.game-detail-page {
+  width: 100%;
+  padding-left: 1rem;
+  flex: 1;
+  flex-flow: column nowrap;
+  display: flex;
+  align-items: center;
+}
+
+.game-detail-page > h4 {
+  padding-bottom: 1rem;
+}
+
+.game-detail-page > div.goal-info-item:last-child {
+  margin-bottom: 5rem;
+}
+.log-container.forward > canvas {
+  padding-bottom: 4rem;
+}
+
+.log-single-item {
+  margin: 0.3rem 0.6rem;
+  padding: 0.5rem;
+  border-radius: 0 0.5rem 0 1rem;
+  border: 1px solid var(--white);
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.log-single-item > div > img {
+  margin-right: 1rem;
+}
+
+.log-result {
+  margin-right: 1rem;
+}
+
+.log-multi-item {
+  margin: 0.3rem 0.6rem;
+  padding: 0.5rem;
+  border-radius: 0 0.5rem 0 1rem;
+  border: 1px solid var(--white);
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.log-multi-info {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+
+.log-multi-info > div > div > img {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+}
+
+.log-multi-info > div > div > h6 {
+  margin: 0.5rem;
+}
+
+.log-multi-info > div > div > img.my-profile {
+  border: 2px solid var(--neon);
+}
+
+.log-multi-info > div > div > h6.my-profile {
+  color: var(--neon);
+}
+
+.log-single-item > div {
+  display: flex;
+  align-items: center;
+}
+
+.log-single-item > div > img {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+}
+
+.log-single-item > div > h4 {
+  margin-left: 1rem;
+}
+
+.goal-info-empty {
+  width: 80%;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--gray70);
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+}
+
+.goal-info-item {
+  width: 80%;
+  padding: 0.5rem 2rem;
+  border-bottom: 1px solid var(--gray70);
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+}
+
+.goal-info-item > p {
+  width: 30%;
+  text-align: center;
+  animation: slideDown 0.5s ease-out forwards;
+}
+
+.goal-info-item > p.no {
+  width: 10%;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.goal-info-item.main {
+  border-bottom: 2px solid var(--white);
+}
+
+.goal-info-item.main > p {
+  animation: none;
+}
+
+.game-detail {
+  width: 90%;
+  margin-bottom: 3rem;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+}
+
+.game-detail > canvas {
+  border: 2px solid var(--white);
+  border-radius: 0.4rem;
+}

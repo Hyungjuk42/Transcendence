@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            color: white;
+            height: 100vh;
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: white;
+        }
+        #tournamentBracket {
+            width: 80%;
+            max-width: 1200px;
+            margin-bottom: 20px;
+            color: white;
+        }
+        .bracket-match {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .bracket-match div {
+            width: 45%;
+            text-align: center;
+            padding: 10px;
+            border: 2px solid #fff;
+        }
+        #gameContainer {
+            position: relative;
+            width: 80%;
+            max-width: 1200px;
+            aspect-ratio: 4/3;
+        }
+        #gameCanvas {
+            width: 100%;
+            height: 100%;
+            border: 2px solid #fff;
+            background-color: #000;
+            display: none;
+        }
+        #info {
+            margin-bottom: 20px;
+        }
+        #scores {
+            font-size: 24px;
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #countdown {
+            font-size: 48px;
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+        #errorMessage {
+            font-size: 24px;
+            color: red;
+            margin-bottom: 20px;
+        }
+        #players {
+            font-size: 24px;
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #observers {
+            font-size: 18px;
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .winner-section {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="gameTitle">Tournament Game</h1>
+    <div id="tournamentBracket">
+        <div class="bracket-match" id="match1">
+            <div id="player1">Player 1</div>
+            <div id="player2">Player 2</div>
+        </div>
+        <div class="bracket-match" id="match2">
+            <div id="player3">Player 3</div>
+            <div id="player4">Player 4</div>
+        </div>
+        <div class="bracket-match" id="finalMatch">
+            <div id="winnerA">Winner of Match 1</div>
+            <div id="winnerB">Winner of Match 2</div>
+        </div>
+    </div>
+    <div id="waitingMessage">Waiting for other players...</div> <!-- 게임 대기 메시지 -->
+    <div id="errorMessage"></div> <!-- 에러 메시지 -->
+    <div id="players" style="display: none;"></div> <!-- 플레이어 정보 -->
+    <div id="observers" style="display: none;"></div> <!-- 옵저버 정보 -->
+    <div id="scores">Scores: 0 - 0</div> <!-- 스코어 보드 -->
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="1200" height="900"></canvas> <!-- 게임 캔버스 -->
+        <div id="countdown">3</div> <!-- 카운트다운 -->
+    </div>
+    <div class="winner-section" id="winner">
+        <h2>Winner: <span id="winnerName"></span></h2>
+    </div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const countdownElement = document.getElementById('countdown');
+        const errorMessageElement = document.getElementById('errorMessage');
+        const winnerSection = document.getElementById('winner');
+        const winnerNameElement = document.getElementById('winnerName');
+        const gameTitle = document.getElementById('gameTitle');
+
+        const player1Element = document.getElementById('player1');
+        const player2Element = document.getElementById('player2');
+        const player3Element = document.getElementById('player3');
+        const player4Element = document.getElementById('player4');
+        const winnerAElement = document.getElementById('winnerA');
+        const winnerBElement = document.getElementById('winnerB');
+
+        let game = {};
+        let playerRole = '';  // 'left', 'right', 'observer'
+        let matchId = '';
+
+        const roomId = "{{ room_id }}"; // Django template에서 room_id를 가져옴
+        const socket = new WebSocket('ws://' + window.location.host + '/ws/tournament/' + roomId + '/');
+
+        socket.onopen = function(e) {
+            console.log("웹소켓 서버에 연결되었습니다.");
+        };
+
+        socket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            //if (data.type !== 'update_game')
+                console.log("서버로부터 메시지를 받았습니다:", data);
+            if (data.type === 'game_start') {
+                displayPlayers(data); // 플레이어 정보 표시
+                displayObservers(data); // 옵저버 정보 표시
+                startCountdown(data); // 게임 시작 카운트다운
+                setPlayerRole(data.role); // 플레이어 역할 설정
+                matchId = data.match; // 매치 ID 설정
+                updateGameTitle(data.match); // 게임 제목 업데이트
+            } else if (data.type === 'error') {
+                showErrorAndRedirect(data.message); // 에러 메시지 표시 후 리디렉션
+            } else if (data.type === 'update_game') {
+                game = data.game;
+                updateGameCanvas(); // 게임 캔버스 업데이트
+            } else if (data.type === 'game_over') {
+                handleGameOver(data); // 게임 종료 처리
+            } else if (data.type === 'final_game_start') {
+                handleFinalGameStart(data); // 최종 게임 시작 처리
+            }
+        };
+
+        socket.onclose = function(e) {
+            console.log("웹소켓 서버와 연결이 끊어졌습니다.");
+        };
+
+        socket.onerror = function(e) {
+            console.error("웹소켓 에러 발생:", e);
+        };
+
+        function setPlayerRole(role) {
+            playerRole = role;
+        }
+
+        function showErrorAndRedirect(message) {
+            errorMessageElement.textContent = message;
+            setTimeout(() => {
+                window.location.href = '/api/lobby/';
+            }, 3000);
+        }
+
+        function displayPlayers(data) {
+            const playersElement = document.getElementById('players');
+            playersElement.textContent = `${data.game.players[0]} vs ${data.game.players[1]}`;
+            playersElement.style.display = 'block';
+        }
+
+        function displayObservers(data) {
+            const observersElement = document.getElementById('observers');
+            const observers = data.game.players.filter(player => !data.game.players.includes(player));
+            observersElement.textContent = `Observers: ${observers.join(', ')}`;
+            observersElement.style.display = 'block';
+        }
+
+        function updateGameTitle(match_id) {
+            if (match_id === 'f') {
+                gameTitle.textContent = 'Tournament Game - Final';
+            } else {
+                gameTitle.textContent = `Tournament Game - Match ${match_id.toUpperCase()}`;
+            }
+        }
+
+        function startCountdown(data) {
+            game = data.game;
+            document.getElementById('waitingMessage').style.display = 'none';
+            document.getElementById('scores').style.display = 'block';
+            canvas.style.display = 'block';
+
+            let countdown = 3;
+            countdownElement.textContent = countdown;
+            countdownElement.style.display = 'block';
+
+            const interval = setInterval(() => {
+                countdown -= 1;
+                if (countdown > 0) {
+                    countdownElement.textContent = countdown;
+                } else {
+                    countdownElement.style.display = 'none';
+                    clearInterval(interval);
+                    sendStartGame();
+                }
+            }, 1000);
+        }
+
+        function sendStartGame() {
+            const startData = {
+                type: 'start_game',
+                role: playerRole,
+                match: matchId
+            };
+            socket.send(JSON.stringify(startData));
+        }
+
+        function updateGameCanvas() {
+            const scale = canvas.width / 1200;
+            const currentMatch = game;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 공 그리기
+            ctx.beginPath();
+            ctx.arc(currentMatch.ball.x * scale, currentMatch.ball.y * scale, currentMatch.ball.radius * scale, 0, Math.PI * 2);
+            ctx.fillStyle = "#FFF";
+            ctx.fill();
+            ctx.closePath();
+
+            // 패들 그리기
+            ctx.fillStyle = "#FFF";
+            ctx.fillRect(10 * scale, currentMatch.player_bar.left * scale, 10 * scale, 180 * scale); // 왼쪽 패들
+            ctx.fillRect((canvas.width - 20 * scale), currentMatch.player_bar.right * scale, 10 * scale, 180 * scale); // 오른쪽 패들
+
+            // 플레이어 이름 그리기
+            ctx.font = `${20 * scale}px Arial`;
+            ctx.fillStyle = "white";
+            ctx.textAlign = "center";
+            ctx.fillText(currentMatch.players[0], 100 * scale, 30 * scale);
+            ctx.fillText(currentMatch.players[1], (canvas.width - 100 * scale), 30 * scale);
+
+            // VS 텍스트 그리기
+            ctx.fillText("VS", canvas.width / 2, 30 * scale);
+
+            // 스코어 업데이트
+            document.getElementById('scores').textContent = `Scores: ${currentMatch.scores.left} - ${currentMatch.scores.right}`;
+        }
+
+        function handleGameOver(data) {
+            const isWinner = data.winner === data.you;
+
+            updateBracket(data); // 대진표 업데이트
+
+            if (isWinner && (data.match === 'a' || data.match === 'b')) {
+                console.log('Sending final_ready message'); // 디버깅 메시지
+                socket.send(JSON.stringify({ type: 'final_ready' }));
+            }
+
+            if (data.match === 'f') {
+                winnerSection.style.display = 'block';
+                winnerNameElement.textContent = data.winner;
+                const xData = {
+                    type: "disconnect",
+                  };
+                  socket.send(JSON.stringify(xData));
+                // 3초 뒤 방으로 리디렉션
+                setTimeout(() => {
+                    window.location.href = '/api/room/' + roomId + '/';
+                }, 1000);
+            }
+        }
+
+        function updateBracket(data) {
+            const matchElement = data.match === 'a' ? winnerAElement : winnerBElement;
+            matchElement.textContent = `${data.winner} (Score: ${data.score.left} - ${data.score.right})`;
+        }
+
+        function handleFinalGameStart(data) {
+            game = data.game;
+            setPlayerRole(data.role); // 역할 설정
+            matchId = data.match; // 매치 ID 설정
+            startFinalCountdown(data); // 최종 게임 카운트다운 시작
+        }
+
+        function startFinalCountdown(data) {
+            document.getElementById('waitingMessage').style.display = 'none';
+            document.getElementById('scores').style.display = 'block';
+            canvas.style.display = 'block';
+
+            let countdown = 3;
+            countdownElement.textContent = countdown;
+            countdownElement.style.display = 'block';
+
+            const interval = setInterval(() => {
+                countdown -= 1;
+                if (countdown > 0) {
+                    countdownElement.textContent = countdown;
+                } else {
+                    countdownElement.style.display = 'none';
+                    clearInterval(interval);
+                    sendStartFinalGame();
+                }
+            }, 1000);
+        }
+
+        function sendStartFinalGame() {
+            const startData = {
+                type: 'start_final_game',
+                role: playerRole,
+                match: 'f'
+            };
+            socket.send(JSON.stringify(startData));
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (playerRole && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+                const direction = e.key === 'ArrowUp' ? 'up' : 'down';
+                sendBarMove(direction);
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (playerRole && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+                sendStopBar();
+            }
+        });
+
+        function sendBarMove(direction) {
+            const moveData = {
+                type: 'move_bar',
+                direction: direction,
+                role: playerRole,
+                match: matchId
+            };
+            socket.send(JSON.stringify(moveData));
+        }
+
+        function sendStopBar() {
+            const stopData = {
+                type: 'stop_bar',
+                role: playerRole,
+                match: matchId
+            };
+            socket.send(JSON.stringify(stopData));
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        function resizeCanvas() {
+            const container = document.getElementById('gameContainer');
+            const canvas = document.getElementById('gameCanvas');
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            updateGameCanvas();
+        }
+
+        resizeCanvas();
+    </script>
+</body>
+</html>

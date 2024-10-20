@@ -1,0 +1,246 @@
+@-webkit-keyframes scale-in-shake {
+  0% {
+    -webkit-transform: scale(0.95);
+    -moz-transform: scale(0.95);
+    -ms-transform: scale(0.95);
+    -o-transform: scale(0.95);
+    transform: scale(0.95);
+  }
+  20% {
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -ms-transform: scale(1);
+    -o-transform: scale(1);
+    transform: scale(1);
+  }
+  40% {
+    margin-left: -10px;
+  }
+  60% {
+    margin-left: 0;
+    margin-right: -20px;
+  }
+  80% {
+    margin-right: 0;
+    margin-left: -20px;
+  }
+  100% {
+    margin: 0;
+  }
+}
+@-moz-keyframes scale-in-shake {
+  0% {
+    -webkit-transform: scale(0.95);
+    -moz-transform: scale(0.95);
+    -ms-transform: scale(0.95);
+    -o-transform: scale(0.95);
+    transform: scale(0.95);
+  }
+  20% {
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -ms-transform: scale(1);
+    -o-transform: scale(1);
+    transform: scale(1);
+  }
+  40% {
+    margin-left: -10px;
+  }
+  60% {
+    margin-left: 0;
+    margin-right: -20px;
+  }
+  80% {
+    margin-right: 0;
+    margin-left: -20px;
+  }
+  100% {
+    margin: 0;
+  }
+}
+@-ms-keyframes scale-in-shake {
+  0% {
+    -webkit-transform: scale(0.95);
+    -moz-transform: scale(0.95);
+    -ms-transform: scale(0.95);
+    -o-transform: scale(0.95);
+    transform: scale(0.95);
+  }
+  20% {
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -ms-transform: scale(1);
+    -o-transform: scale(1);
+    transform: scale(1);
+  }
+  40% {
+    margin-left: -10px;
+  }
+  60% {
+    margin-left: 0;
+    margin-right: -20px;
+  }
+  80% {
+    margin-right: 0;
+    margin-left: -20px;
+  }
+  100% {
+    margin: 0;
+  }
+}
+@-o-keyframes scale-in-shake {
+  0% {
+    -webkit-transform: scale(0.95);
+    -moz-transform: scale(0.95);
+    -ms-transform: scale(0.95);
+    -o-transform: scale(0.95);
+    transform: scale(0.95);
+  }
+  20% {
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -ms-transform: scale(1);
+    -o-transform: scale(1);
+    transform: scale(1);
+  }
+  40% {
+    margin-left: -10px;
+  }
+  60% {
+    margin-left: 0;
+    margin-right: -20px;
+  }
+  80% {
+    margin-right: 0;
+    margin-left: -20px;
+  }
+  100% {
+    margin: 0;
+  }
+}
+@keyframes scale-in-shake {
+  0% {
+    -webkit-transform: scale(0.95);
+    -moz-transform: scale(0.95);
+    -ms-transform: scale(0.95);
+    -o-transform: scale(0.95);
+    transform: scale(0.95);
+  }
+  20% {
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -ms-transform: scale(1);
+    -o-transform: scale(1);
+    transform: scale(1);
+  }
+  40% {
+    margin-left: -10px;
+  }
+  60% {
+    margin-left: 0;
+    margin-right: -20px;
+  }
+  80% {
+    margin-right: 0;
+    margin-left: -20px;
+  }
+  100% {
+    margin: 0;
+  }
+}
+@-webkit-keyframes scale-in {
+  0% {
+    -webkit-transform: scale(0.95);
+    -moz-transform: scale(0.95);
+    -ms-transform: scale(0.95);
+    -o-transform: scale(0.95);
+    transform: scale(0.95);
+  }
+  90% {
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -ms-transform: scale(1);
+    -o-transform: scale(1);
+    transform: scale(1);
+  }
+}
+@-moz-keyframes scale-in {
+  0% {
+    -webkit-transform: scale(0.95);
+    -moz-transform: scale(0.95);
+    -ms-transform: scale(0.95);
+    -o-transform: scale(0.95);
+    transform: scale(0.95);
+  }
+  90% {
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -ms-transform: scale(1);
+    -o-transform: scale(1);
+    transform: scale(1);
+  }
+}
+@-ms-keyframes scale-in {
+  0% {
+    -webkit-transform: scale(0.95);
+    -moz-transform: scale(0.95);
+    -ms-transform: scale(0.95);
+    -o-transform: scale(0.95);
+    transform: scale(0.95);
+  }
+  90% {
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -ms-transform: scale(1);
+    -o-transform: scale(1);
+    transform: scale(1);
+  }
+}
+@-o-keyframes scale-in {
+  0% {
+    -webkit-transform: scale(0.95);
+    -moz-transform: scale(0.95);
+    -ms-transform: scale(0.95);
+    -o-transform: scale(0.95);
+    transform: scale(0.95);
+  }
+  90% {
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -ms-transform: scale(1);
+    -o-transform: scale(1);
+    transform: scale(1);
+  }
+}
+@keyframes scale-in {
+  0% {
+    -webkit-transform: scale(0.95);
+    -moz-transform: scale(0.95);
+    -ms-transform: scale(0.95);
+    -o-transform: scale(0.95);
+    transform: scale(0.95);
+  }
+  90% {
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -ms-transform: scale(1);
+    -o-transform: scale(1);
+    transform: scale(1);
+  }
+}
+
+body #PswdRoomModal .active {
+  -webkit-animation: scale-in-shake 0.3s;
+  -moz-animation: scale-in-shake 0.3s;
+  -ms-animation: scale-in-shake 0.3s;
+  -o-animation: scale-in-shake 0.3s;
+  animation: scale-in-shake 0.3s;
+}
+
+body #CreateRoomModal .active {
+  -webkit-animation: scale-in-shake 0.3s;
+  -moz-animation: scale-in-shake 0.3s;
+  -ms-animation: scale-in-shake 0.3s;
+  -o-animation: scale-in-shake 0.3s;
+  animation: scale-in-shake 0.3s;
+}

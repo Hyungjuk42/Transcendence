@@ -1,0 +1,258 @@
+version: "3"
+services:
+  frontend:
+    build:
+      context: ${FE_PATH}
+      dockerfile: Dockerfile.frontend
+    container_name: frontend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5173"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    init: true
+    ports:
+      - "5173:5173"
+    restart: on-failure:3
+    volumes:
+      - ${FE_PATH}:/app
+    tty: true
+    networks:
+      - transcendence
+  backend:
+    build:
+      context: ${BE_PATH}
+      dockerfile: Dockerfile.backend
+    container_name: backend
+    env_file:
+      - .env
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ${BE_PATH}:/code
+    init: true
+    ports:
+      - "8000:8000"
+    restart: on-failure:3
+    tty: true
+    networks:
+      - transcendence
+  postgresql:
+    container_name: postgresql
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      DJANGO_DB_USER: postgres
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    init: true
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    restart: on-failure:3
+    tty: true
+    networks:
+      - transcendence
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  nginx:
+    container_name: nginx_gateway
+    build:
+      context: ${NGINX_PATH}
+      dockerfile: Dockerfile.nginx
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    init: true
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: on-failure:3
+    depends_on:
+      - backend
+    tty: true
+    volumes:
+      - "${NGINX_PATH}:/etc/nginx/conf.d"
+    networks:
+      - transcendence
+  logstash:
+    container_name: logstash
+    image: docker.elastic.co/logstash/logstash:8.14.1
+    volumes:
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./logstash/config/logstash.conf:/config/logstash.conf
+      - ./elasticsearch/certs:/usr/share/logstash/config/certs
+      - ./backend/log/:/django/
+    environment:
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+    command: /usr/share/logstash/bin/logstash -f /config/logstash.conf
+    networks:
+      - transcendence
+    ports:
+      - "5044:5044"
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:7.17.22
+    environment:
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+    networks:
+      - transcendence
+    volumes:
+      - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
+      - ./elasticsearch/certs:/config
+      - kibana_data:/usr/share/kibana/data
+    ports:
+      - "5601:5601"
+    restart: on-failure:3
+  elasticsearch:
+    container_name: elasticsearch
+    build:
+      context: ./elasticsearch
+      dockerfile: Dockerfile.elasticsearch
+    environment:
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - discovery.type=single-node
+    volumes:
+      - ./elasticsearch/certs:/usr/share/elasticsearch/certs
+      - esdata:/usr/share/elasticsearch/data
+    depends_on:
+      - kibana
+    ports:
+    - "9200:9200"
+    - "9300:9300"
+    networks:
+      - transcendence
+  kibana_setting:
+    image: docker.elastic.co/kibana/kibana:7.17.22
+    volumes:
+      - ./elasticsearch/certs/:/config
+      - ./kibana_setting/:/run
+    environment:
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+    networks:
+      - transcendence
+    command: /run/run.sh
+  certificate-generator:
+    container_name: certificate-generator
+    build:
+      context: ${CERTIFICATE_PATH}
+      dockerfile: Dockerfile.certificate
+    volumes:
+      - ${CERTIFICATE_PATH}/certs:/etc/ssl/certs
+    networks:
+      - transcendence
+
+  prometheus:
+    env_file:
+      - .env
+    container_name: prometheus
+    build:
+      context: ${PROMETHEUS_PATH}
+      dockerfile: Dockerfile.prometheus
+    depends_on:
+      - certificate-generator
+    volumes:
+      - ${PROMETHEUS_PATH}/data:/prometheus
+      - ${CERTIFICATE_PATH}/certs:/etc/ssl/certs
+    ports:
+      - "9090:9090"
+    networks:
+      - transcendence
+    entrypoint:
+      - "/usr/local/bin/entrypoint.sh"
+      - "/etc/ssl/certs/prometheus-selfsigned.crt"
+      - "60"
+      - "/opt/prometheus/prometheus"
+      - "--config.file=/opt/prometheus/prometheus.yml"
+      - "--web.config.file=/opt/prometheus/web.yml"
+      - "--storage.tsdb.retention=14d"
+    restart: always
+
+  node-exporter:
+    container_name: node-exporter
+    build:
+      context: ${PROMETHEUS_PATH}
+      dockerfile: Dockerfile.node-exporter
+    depends_on:
+      - certificate-generator
+    volumes:
+      - ${CERTIFICATE_PATH}/certs:/etc/ssl/certs
+    ports:
+      - "9100:9100"
+    networks:
+      - transcendence
+    entrypoint:
+      - "/usr/local/bin/entrypoint.sh"
+      - "/etc/ssl/certs/node-exporter-selfsigned.crt"
+      - "60"
+      - "/usr/local/bin/node_exporter"
+      - "--web.listen-address=:9100"
+      - "--web.config=opt/node-exporter/web.yml"
+    restart: always
+
+
+  alertmanager:
+    container_name: alertmanager
+    env_file:
+      - .env
+    build:
+      context: ${PROMETHEUS_PATH}
+      dockerfile: Dockerfile.alertmanager
+    depends_on:
+      - certificate-generator
+    volumes:
+      - ${CERTIFICATE_PATH}/certs:/etc/ssl/certs
+    ports:
+      - "9093:9093"
+    networks:
+      - transcendence
+    entrypoint:
+      - "/usr/local/bin/entrypoint.sh"
+      - "/etc/ssl/certs/alertmanager-selfsigned.crt"
+      - "60"
+      - "/usr/local/bin/alertmanager"
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--storage.path=/alertmanager"
+      - "--web.config.file=/opt/alertmanager/web.yml"
+    restart: always
+
+  grafana:
+    container_name: grafana
+    env_file:
+      - .env
+    build:
+      context: ${GRAFANA_PATH}
+      dockerfile: Dockerfile.grafana
+    volumes:
+      - ${GRAFANA_PATH}/data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - transcendence
+
+networks:
+  transcendence:
+    name: transcendence
+    driver: bridge
+volumes:
+  esdata:
+    driver: local
+  kibana_data:
+    driver: local
+  postgres_data:
+    driver: local

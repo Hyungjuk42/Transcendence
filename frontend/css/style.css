@@ -1,0 +1,31 @@
+html,
+body {
+  width: 100vw;
+  height: 100vh;
+}
+
+body {
+  overflow: hidden;
+}
+
+body * {
+  box-sizing: border-box;
+}
+
+#middle {
+  height: calc(100vh - 3rem);
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+h6 {
+  font-size: 1.2rem;
+}
+
+h3 {
+  font-size: 2rem;
+}
+
+h4 {
+  font-size: 1.5rem;
+}

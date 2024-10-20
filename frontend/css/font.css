@@ -1,0 +1,11 @@
+@font-face {
+  font-family: "MajorMonoDisplay";
+  src: url(/font/MajorMonoDisplay.ttf);
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: "Quantico";
+  src: url(../font/Quantico.ttf);
+  font-weight: normal;
+}

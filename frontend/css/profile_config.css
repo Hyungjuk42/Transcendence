@@ -1,0 +1,85 @@
+.profile-config-main {
+  width: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: start;
+  align-items: start;
+  padding-left: 2.5rem;
+}
+
+.profile-config-main > h3 {
+  padding: 1rem 0;
+}
+
+.profile-config-list {
+  width: 100%;
+  max-width: 30rem;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: start;
+  padding-left: 1rem;
+}
+
+.profile-config-submit {
+  width: 100%;
+  max-width: 30rem;
+  padding-top: 4rem;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-around;
+}
+
+.config-btn {
+  width: 10rem;
+  height: 2rem;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.5rem;
+  font-size: 1.25rem;
+}
+
+.config-btn > img {
+  width: 1.5rem;
+  height: 1.5rem;
+  padding-right: 0.625rem;
+}
+
+.profile-config-main .profile-config-input {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  align-items: start;
+}
+
+.profile-config-input .check-btn {
+  font-size: 0.875rem;
+}
+
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -50%, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translateZ(0);
+  }
+}
+
+.profile-config-list .active {
+  position: relative;
+  animation: fadeInDown 1s;
+}
+
+.inval-msg {
+  display: none;
+  width: 100%;
+  align-items: end;
+  padding-top: 1.5rem;
+}
+
+.show {
+  display: block;
+}

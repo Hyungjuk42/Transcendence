@@ -1,0 +1,25 @@
+#
+# ** THIS IS AN AUTO-GENERATED FILE **
+#
+
+# Default Kibana configuration for docker target
+server.host: "0.0.0.0"
+server.shutdownTimeout: "5s"
+elasticsearch.hosts: [ "https://elasticsearch:9200" ]
+
+monitoring.ui.container.elasticsearch.enabled: true
+
+elasticsearch.ssl.verificationMode: certificate
+elasticsearch.ssl.certificateAuthorities: [ "/config/ca/ca.crt" ]
+# elasticsearch.ssl.certificate: /config/instance/instance.crt
+# elasticsearch.ssl.key: /config/instance/instance.key
+elasticsearch.ssl.certificate: /config/elasticsearch/elasticsearch.crt
+elasticsearch.ssl.key: /config/elasticsearch/elasticsearch.key
+
+server.ssl.enabled: true
+server.ssl.certificate: /config/elasticsearch/elasticsearch.crt
+server.ssl.key: /config/elasticsearch/elasticsearch.key
+server.ssl.certificateAuthorities: [ "/config/ca/ca.crt" ]
+
+elasticsearch.username: 'elastic'
+elasticsearch.password: '${ELASTIC_PASSWORD}'

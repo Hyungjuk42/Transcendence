@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://jsdelivr.net 'sha256-JiRe7w7hwWueGyERKidzVVOe0kGw6gcyiCpQoSGyNV0=' 'unsafe-eval' https://cdn.jsdelivr.net https://ajax.googleapis.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: blob: https://storage.googleapis.com; font-src 'self' https://cdn.jsdelivr.net; connect-src 'self'; frame-src 'self';">
+	  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+	<!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://ajax.googleapis.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://storage.googleapis.com; font-src 'self' https://cdn.jsdelivr.net; connect-src 'self'; frame-src 'self';"> -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.css"
+      rel="stylesheet"
+    />
+    <link href="css/reset.css" rel="stylesheet" />
+    <link href="css/main.css" rel="stylesheet" />
+    <link href="css/twofa.css" rel="stylesheet" />
+    <link href="css/top_nav_bar.css" rel="stylesheet" />
+    <link href="css/main_section.css" rel="stylesheet" />
+    <link href="css/user_list.css" rel="stylesheet" />
+    <link href="css/side_nav_bar.css" rel="stylesheet" />
+    <link href="css/lobby_rooms.css" rel="stylesheet" />
+    <link href="css/lobby_profile.css" rel="stylesheet" />
+    <link href="css/profile.css" rel="stylesheet" />
+    <link href="css/modal.css" rel="stylesheet" />
+    <link href="css/profile_change.css" rel="stylesheet" />
+    <link href="css/profile_config.css" rel="stylesheet" />
+    <link href="css/items.css" rel="stylesheet" />
+    <link href="css/game.css" rel="stylesheet" />
+    <link href="css/game-room.css" rel="stylesheet" />
+    <link href="css/style.css" rel="stylesheet" />
+    <link href="css/brracket.css" rel="stylesheet" />
+    <link href="css/tournament.css" rel="stylesheet" />
+    <link href="css/custom.css" rel="stylesheet" />
+    <link href="css/shaking_animation.css" rel="stylesheet" />
+    <link href="css/game_result.css" rel="stylesheet" />
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/icon/pong.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Transcendence</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script>
+      document.addEventListener('DOMContentLoaded', (event) => {
+          document.body.ondragstart = function() { return false; };
+          document.body.onselectstart = function() { return false; };
+          document.body.oncontextmenu = function() { return false; }; // 우클릭 방지 (선택 사항)
+      });
+    </script>
+    </script>
+    <script type="module" src="/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+  </body>
+</html>

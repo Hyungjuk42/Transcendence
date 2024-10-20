@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Input</title>
+    <style>
+        .number-input {
+            width: 50px;
+            margin-right: 10px;
+        }
+    </style>
+    <script>
+        function submitNumbers() {
+            const numbers = [];
+            for (let i = 1; i <= 6; i++) {
+                const number = document.getElementById(`number${i}`).value;
+                numbers.push(number);
+            }
+            const combinedNumber = numbers.join('');
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            fetch('/api/auth/otp/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                },
+                body: JSON.stringify({ combined_number: combinedNumber })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // 현재 호스트를 기준으로 리다이렉트
+                    const baseUrl = window.location.origin;
+                    window.location.href = baseUrl + data.redirect_url;
+                } else {
+                    // 에러 메시지를 표시
+                    document.getElementById('result').innerText = data.message;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('result').innerText = 'An error occurred. Please try again.';
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Enter 6 Numbers</h1>
+    <input type="number" id="number1" class="number-input" min="0" max="9">
+    <input type="number" id="number2" class="number-input" min="0" max="9">
+    <input type="number" id="number3" class="number-input" min="0" max="9">
+    <input type="number" id="number4" class="number-input" min="0" max="9">
+    <input type="number" id="number5" class="number-input" min="0" max="9">
+    <input type="number" id="number6" class="number-input" min="0" max="9">
+    <br><br>
+    <button type="button" onclick="submitNumbers()">Submit</button>
+    <p id="result"></p>
+
+    <!-- CSRF Token -->
+    <form style="display:none;">
+        {% csrf_token %}
+    </form>
+</body>
+</html>

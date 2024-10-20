@@ -1,0 +1,27 @@
+@import "./color.css";
+@import "./reset.css";
+/* @import "./font.css"; */
+
+.main-page{
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+	width: 100vw;
+}
+
+.title{
+	text-align: center;
+	margin-bottom: 22px;
+}
+
+.large-btn{
+	background-color: var(--gray70);
+	border-radius: 10px;
+	text-align: center;
+	width: 18rem;
+	height: 4rem;
+	font-size: 2.5rem;
+	font-family: quantico;
+}

@@ -1,0 +1,18 @@
+FROM node:lts-alpine3.19
+
+# Set the working directory
+WORKDIR /app
+
+EXPOSE 5173
+
+# Install dependencies
+
+RUN apk update && \ 
+    apk upgrade && \
+    apk add --no-cache g++ make python3 && \
+    apk add --no-cache curl
+
+
+
+# Run the application
+CMD ["./run.sh"]

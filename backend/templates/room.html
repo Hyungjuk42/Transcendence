@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Room Page</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0;
+        padding: 20px;
+      }
+      h1,
+      h2 {
+        margin-bottom: 20px;
+      }
+      #messages {
+        margin-bottom: 20px;
+      }
+      .user-box {
+        width: 150px;
+        height: 150px;
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        margin: 10px;
+      }
+      #userContainer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+      }
+      #roomInfo {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      #startButton {
+        display: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Room Page</h1>
+    <div id="roomInfo">
+      <h2 id="roomName"></h2>
+      <p id="host"></p>
+      <p id="mode"></p>
+    </div>
+    <div id="userContainer">
+      <div id="user1" class="user-box">Waiting...</div>
+      <div>VS</div>
+      <div id="user2" class="user-box">Waiting...</div>
+    </div>
+    <button id="startButton" onclick="startGame()">Start Game</button>
+    <div id="messages"></div>
+    <script>
+      const roomId = "{{ room_id }}"; // Django template에서 room_id를 가져옴
+      const socket = new WebSocket(
+        "ws://" +
+          window.location.host +
+          "/ws/room/" +
+          roomId +
+          "/"
+      );
+
+      socket.onopen = function (e) {
+        console.log("웹소켓 서버에 연결되었습니다.");
+      };
+
+      socket.onmessage = async function (e) {
+        const data = JSON.parse(e.data);
+        console.log("서버로부터 메시지를 받았습니다:", data);
+        if (data.type === "room_destroyed") {
+          window.location.href = "/api/lobby/";
+        } else if (
+          data.type === "connect_user" ||
+          data.type === "disconnect_user"
+        ) {
+          updateUserList(data.user_list);
+        } else if (data.type === "room_info") {
+          updateRoomInfo(data);
+        } else if (data.type === "room_ready") {
+          handleRoomFull(data);
+        } else if (data.type === "room_not_exist") {
+          window.location.href = "/api/lobby/";
+        } else if (data.type === "room_full") {
+          alert("Room is full!");
+          window.location.href = "/api/lobby/";
+        } else if (data.type === "goto_game") {
+          if (data.mode === 2) {
+            await socket.close();
+            window.location.href = "/api/game/" + data.room_id + "/";
+          } else if (data.mode === 4) {
+            const Data = {
+              type: "disconnect",
+            };
+            socket.send(JSON.stringify(Data));
+            setTimeout(() => {
+              window.location.href = "/api/game/tournament/" + data.room_id + "/";
+            }, 1000);
+          }
+        }
+      };
+
+      socket.onclose = function (e) {
+        console.log("웹소켓 서버와 연결이 끊어졌습니다.");
+      };
+
+      socket.onerror = function (e) {
+        console.error("웹소켓 에러 발생:", e);
+      };
+
+      function updateUserList(userList) {
+        const user1Div = document.getElementById("user1");
+        const user2Div = document.getElementById("user2");
+
+        user1Div.textContent = userList[0] || "Waiting...";
+        user2Div.textContent = userList[1] || "Waiting...";
+
+        // Update host information
+        document.getElementById("host").textContent = `Host: ${userList[0] || "Waiting..."}`;
+      }
+
+      function updateRoomInfo(data) {
+        document.getElementById(
+          "roomName"
+        ).textContent = `Room: ${data.room_name}`;
+        document.getElementById("host").textContent = `Host: ${data.user_list[0]}`; // 수정된 부분
+        document.getElementById("mode").textContent = `Mode: ${data.mode}`;
+      }
+
+      function handleRoomFull(data) {
+        
+        if (data.you === data.host) {
+          document.getElementById("startButton").style.display = "block";
+        }
+      }
+
+      function startGame() {
+        const startData = {
+          type: "start_game",
+        };
+        socket.send(JSON.stringify(startData));
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,136 @@
+@import "./reset.css";
+@import "./font.css";
+
+.game-room-main {
+  flex: 1;
+  display: flex;
+  flex-flow: row nowrap;
+  padding-bottom: 1rem;
+}
+
+.game-room-nav {
+  display: flex;
+  flex-flow: column nowrap;
+  margin-left: 1rem;
+}
+
+.game-room-nav > button {
+  width: 1.8rem;
+  height: 4rem;
+  border: 1px solid var(--white);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 1rem 0 0 0.2rem;
+}
+
+.game-room-nav > button.selected {
+  background-color: var(--white);
+  color: var(--primary-color);
+}
+
+.game-room {
+  flex: 1;
+  margin-right: 1rem;
+  border-radius: 0 0 0 1rem;
+  border-left: 2px solid var(--white);
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  height: calc(90vh - min(20vh, 8rem));
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.game-room > h5 {
+  padding-bottom: 7rem;
+}
+
+.user-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(20%, auto));
+  /* grid-template-columns: repeat(8, 5rem); */
+  grid-auto-rows: auto;
+  grid-gap: 1rem;
+  place-items: center start;
+  place-content: center start;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 50%;
+  max-height: 20rem;
+  max-width: 80rem;
+  padding-bottom: 2rem;
+}
+
+/* .user-cards {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5625rem;
+  margin-top: 1.25rem;
+  margin-bottom: 7rem;
+} */
+
+.user-cards .user-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid white;
+  border-radius: 10px;
+  min-width: 0;
+  min-height: 2.5rem;
+  width: 100%;
+  height: 100%;
+  max-width: 20rem;
+  max-height: 25rem;
+}
+
+.user-card > img {
+  flex: 1;
+  border-bottom: 2px solid white;
+  width: 100%;
+  height: calc(100% - 3rem);
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.user-card > img.hide {
+  display: none;
+}
+.user-card > p {
+  text-align: left;
+  /* font-size: 1.5rem; */
+}
+
+.user-cards .clients {
+  border-color: #dbff00;
+}
+
+.align-end {
+  display: flex;
+  width: 100%;
+  flex-flow: row nowrap;
+  justify-content: end;
+  align-items: center;
+}
+
+.align-end > button {
+  margin-left: 1rem;
+}
+
+#tool-tip {
+  width: 25rem;
+  position: fixed;
+  background-color: var(--gray70);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--primary-color);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  z-index: 1;
+  display: none;
+}

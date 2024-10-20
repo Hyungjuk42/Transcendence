@@ -1,0 +1,52 @@
+@import url(./color.css);
+
+.pong-game-main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  position: relative;
+}
+#pong-game {
+  display: none;
+  z-index: 1;
+  border: 3px solid var(--white);
+}
+
+.pong-game-info {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  color: var(--white);
+  /* left: 50%; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pong-game-info > h1 {
+  text-align: center;
+}
+
+.pong-game-info > p.user1 {
+  position: absolute;
+  top: 0.5rem;
+}
+
+.pong-game-info > p.user2 {
+  position: absolute;
+  top: 0.5rem;
+}
+
+.pong-game-info > h6.user1 {
+  position: absolute;
+  top: 0.5rem;
+  right: 52%;
+}
+
+.pong-game-info > h6.user2 {
+  position: absolute;
+  top: 0.5rem;
+  left: 52%;
+}

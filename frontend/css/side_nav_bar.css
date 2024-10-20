@@ -1,0 +1,22 @@
+@import url(./color.css);
+
+.side-nav-bar {
+  width: 1.5rem;
+  display: flex;
+  flex-flow: column nowrap;
+  margin-top: 0.5rem;
+}
+
+.side-nav-btn {
+  background-color: var(--primary-color);
+  color: var(--white);
+  /* border: 1px solid var(--white); */
+  box-shadow: 1px var(--white);
+  height: 5rem;
+  clip-path: polygon(0% 15%, 100% 0%, 100% 100%, 0% 60%);
+}
+
+.side-nav-btn.selected {
+  background-color: var(--white);
+  color: var(--black);
+}

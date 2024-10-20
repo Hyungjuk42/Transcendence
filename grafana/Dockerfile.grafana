@@ -1,0 +1,24 @@
+FROM grafana/grafana:latest
+
+# OpenSSL
+USER root
+RUN apk update && apk add --no-cache openssl
+
+
+# SSL 인증서
+RUN mkdir -p /etc/ssl/cert && \
+	openssl req -x509 -newkey rsa:2048 -nodes -keyout /etc/ssl/certs/grafana-selfsigned.key \
+	-out /etc/ssl/certs/grafana-selfsigned.crt -subj "/C=KR/ST=GEYOUNG-GI-DO/L=SEOUL/O=42SEOUL/OU=CARDET/CN=transcendence.42.fr"
+
+RUN chmod 644 /etc/ssl/certs/grafana-selfsigned.key
+RUN chmod 644 /etc/ssl/certs/grafana-selfsigned.crt
+
+RUN mkdir -p /etc/grafana/provisioning
+RUN mkdir -p /etc/grafana/provisioning/dashboards
+COPY ./dashboard /etc/grafana/provisioning/dashboards
+COPY ./provisioning /etc/grafana/provisioning
+COPY grafana.ini /etc/grafana/grafana.ini
+
+EXPOSE 3000
+
+CMD ["grafana-server", "--config=/etc/grafana/grafana.ini"]

@@ -1,0 +1,17 @@
+@import url("./color.css");
+
+.top-nav-bar {
+  background-color: var(--black);
+  width: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--white);
+}
+
+.main-logo {
+  width: 8rem;
+  height: 3rem;
+  margin-left: 1rem;
+}

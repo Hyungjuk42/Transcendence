@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Ping Pong</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            color: white;
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: white;
+        }
+        #gameCanvas {
+            border: 2px solid #fff;
+            background-color: #000;
+        }
+        #scores {
+            font-size: 24px;
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #countdown {
+            font-size: 48px;
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body>
+    <h1>Ping Pong</h1>
+    <div id="scores">Scores: 0 - 0</div>
+    <canvas id="gameCanvas" width="1200" height="900"></canvas>
+    <div id="countdown">3</div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const countdownElement = document.getElementById('countdown');
+
+        let game = {};
+        const playerRoles = { left: 'WASD', right: 'Arrows' };
+        const hostUsername = '{{ host_username }}';
+
+        const socket = new WebSocket('ws://' + window.location.host + '/ws/localgame/' + hostUsername + '/');
+
+        socket.onopen = function(e) {
+            console.log("웹소켓 서버에 연결되었습니다.");
+        };
+
+        socket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            if (data.type === 'game_start') {
+                game = data.game;
+                startCountdown();
+            } else if (data.type === 'update_game') {
+                game = data.game;
+                updateGameCanvas();
+            }
+        };
+
+        socket.onclose = function(e) {
+            console.log("웹소켓 서버와 연결이 끊어졌습니다.");
+        };
+
+        socket.onerror = function(e) {
+            console.error("웹소켓 에러 발생:", e);
+        };
+
+        function startCountdown() {
+            let countdown = 3;
+            countdownElement.textContent = countdown;
+            countdownElement.style.display = 'block';
+
+            const interval = setInterval(() => {
+                countdown -= 1;
+                if (countdown > 0) {
+                    countdownElement.textContent = countdown;
+                } else {
+                    countdownElement.style.display = 'none';
+                    clearInterval(interval);
+                    sendStartGame();
+                }
+            }, 1000);
+        }
+
+        function sendStartGame() {
+            const startData = {
+                type: 'start_game',
+            };
+            socket.send(JSON.stringify(startData));
+        }
+
+        function updateGameCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 공 그리기
+            ctx.beginPath();
+            ctx.arc(game.ball.x, game.ball.y, game.ball.radius, 0, Math.PI * 2);
+            ctx.fillStyle = "#FFF";
+            ctx.fill();
+            ctx.closePath();
+
+            // 패들 그리기
+            ctx.fillStyle = "#FFF";
+            ctx.fillRect(10, game.player_bar.left, 10, 180); // 왼쪽 패들 (높이 180)
+            ctx.fillRect(canvas.width - 20, game.player_bar.right, 10, 180); // 오른쪽 패들 (높이 180)
+
+            // 스코어 업데이트
+            document.getElementById('scores').textContent = `Scores: ${game.scores.left} - ${game.scores.right}`;
+        }
+
+        document.addEventListener('keydown', (e) => {
+            const direction = e.key === 'w' || e.key === 'ArrowUp' ? 'up' : e.key === 's' || e.key === 'ArrowDown' ? 'down' : null;
+            const role = e.key === 'w' || e.key === 's' ? 'left' : e.key === 'ArrowUp' || e.key === 'ArrowDown' ? 'right' : null;
+            if (direction && role) {
+                sendBarMove(direction, role);
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            const role = e.key === 'w' || e.key === 's' ? 'left' : e.key === 'ArrowUp' || e.key === 'ArrowDown' ? 'right' : null;
+            if (role) {
+                sendStopBar(role);
+            }
+        });
+
+        function sendBarMove(direction, role) {
+            const moveData = {
+                type: 'move_bar',
+                direction: direction,
+                role: role
+            };
+            socket.send(JSON.stringify(moveData));
+        }
+
+        function sendStopBar(role) {
+            const stopData = {
+                type: 'stop_bar',
+                role: role
+            };
+            socket.send(JSON.stringify(stopData));
+        }
+    </script>
+</body>
+</html>

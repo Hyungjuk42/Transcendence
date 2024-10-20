@@ -1,0 +1,11 @@
+http.host: "0.0.0.0"
+xpack.monitoring.enabled: true
+xpack.monitoring.elasticsearch.hosts: [ "https://elasticsearch:9200"]
+xpack.monitoring.elasticsearch.username: elastic
+xpack.monitoring.elasticsearch.password: '${ELASTIC_PASSWORD}'
+xpack.monitoring.elasticsearch.ssl.certificate_authority: "/usr/share/logstash/config/certs/ca/ca.crt"
+# xpack.monitoring.elasticsearch.ssl.certificateAuthorities: [ "/usr/share/logstash/config/certs/ca/ca.crt" ]
+# log.level: debug
+# xpack.monitoring.elasticsearch.ssl.certificate_authority: /config/ca/ca.crt
+# xpack.monitoring.elasticsearch.ssl.verificationMode: certificate
+# xpack.monitoring.elasticsearch.ssl.certificate: /config/instance/instance.crt

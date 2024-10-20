@@ -1,0 +1,94 @@
+.game-display {
+  margin: 0;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  /* background-color: #000; */
+}
+
+.marquee {
+  position: absolute;
+  z-index: 999;
+  transform: translate(0%, -50%) rotate(-10deg);
+  top: 50%;
+  width: 150%;
+  overflow: hidden;
+  white-space: nowrap;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #d1180b;
+  padding: 0.5rem 0;
+}
+
+.marquee-main {
+  position: absolute;
+  z-index: 999;
+  height: 100%;
+  width: 100%;
+}
+
+.marquee.transform-2 {
+  transform: translate(0%, -70%) rotate(10deg);
+}
+
+.marquee.transform-2 > .marquee-content {
+  font-size: 3.5rem;
+  animation: marquee 40s linear infinite;
+  border-top-width: 2px;
+  border-bottom-width: 2px;
+}
+
+.marquee.transform-3 {
+  transform: translate(-30%, -20%) rotate(-110deg);
+}
+
+.marquee.transform-3 > .marquee-content {
+  font-size: 1rem;
+  animation: marquee 40s linear infinite;
+  border-top-width: 2px;
+  border-bottom-width: 2px;
+}
+
+.marquee.transform-4 {
+  transform: translate(-15%, -20%) rotate(-40deg);
+}
+
+.marquee.transform-4 > .marquee-content {
+  font-size: 1.5rem;
+  animation: marquee 15s linear infinite;
+  border-top-width: 2px;
+  border-bottom-width: 2px;
+}
+
+.marquee.win {
+  background-color: #ffbf00;
+}
+
+.marquee-content {
+  display: inline-block;
+  font-size: 5rem;
+  color: #fff;
+  font-weight: bold;
+  white-space: nowrap;
+  animation: marquee 60s linear infinite;
+  border-top: 4px solid #fff;
+  border-bottom: 4px solid #fff;
+}
+
+.marquee-content.win {
+  color: #000;
+  border-top: 4px solid #000;
+  border-bottom: 4px solid #000;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}

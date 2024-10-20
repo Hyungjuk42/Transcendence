@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "@/lib/jsx",
+    "module": "CommonJS",
+    "target": "ES6",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@img/*": ["./img/*"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
+}

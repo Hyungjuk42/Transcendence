@@ -1,0 +1,22 @@
+FROM python:3.12.3-slim
+
+# Set Environment Variables
+# PYTHONUNBUFFERED: Prevents Python from buffering stdout and stderr
+# PYTHONDONTWRITEBYTECODE: Prevents Python from writing pyc files to disc
+ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE 1
+
+# Set the working directory
+WORKDIR /code
+
+# Install dependencies
+COPY --chmod=755 requirements.txt .
+COPY --chmod=777 run.sh .
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
+
+# Copy the project
+# COPY --chmod=755 . .
+
+# Run the application
+CMD ["./run.sh"]

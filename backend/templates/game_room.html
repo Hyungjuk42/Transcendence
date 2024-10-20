@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게임 웹소켓</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+        #userlist-container {
+            width: 80%;
+            border: 1px solid black;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        #userlist-container h2 {
+            margin: 0;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        #userlist {
+            border: 1px solid black;
+            height: 100px;
+            overflow-y: scroll;
+            margin-bottom: 10px;
+        }
+        #messages {
+            border: 1px solid black;
+            height: 100px;
+            overflow-y: scroll;
+            margin-bottom: 20px;
+            background-color: #f0f0f0;
+            padding: 5px;
+        }
+        #gameCanvas {
+            border: 1px solid black;
+            display: block;
+            background-color: #f0f0f0;
+            max-width: 100%;
+            max-height: 80vh;
+        }
+        #readyButton {
+            display: block;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="userlist-container">
+        <h2>현재 접속 유저</h2>
+        <div id="userlist"></div>
+    </div>
+    <div id="messages"></div>
+    <canvas id="gameCanvas" width="1000" height="1000"></canvas>
+    <script>
+        const socket = new WebSocket(
+            'ws://' + window.location.host + '/ws/game/room/' + {{ room_number }} + '/'
+        );
+
+        let gameCanvas, ctx;
+        let ball = { x: 500, y: 500, radius: 10 };
+        let leftBar = { y: 450 };
+        let rightBar = { y: 450 };
+        let scores = { left: 0, right: 0 };
+        let countdown = null;
+        let mySide = null;
+        let left_user = "";
+        let right_user = "";
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            gameCanvas = document.getElementById('gameCanvas');
+            ctx = gameCanvas.getContext('2d');
+            resizeCanvas();
+
+            window.addEventListener('resize', resizeCanvas);
+            window.addEventListener('keydown', handleKeyDown);
+        });
+
+        socket.onopen = function(e) {
+            console.log("웹소켓 서버에 연결되었습니다.");
+            alert('게임 방에 입장했습니다.');
+        };
+
+        socket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            console.log("서버로부터 메시지를 받았습니다:", data);
+
+            const messageDiv = document.getElementById('messages');
+            const userlistDiv = document.getElementById('userlist');
+            const newMessage = document.createElement('div');
+
+            if (data.type === 'chat_message') {
+                newMessage.textContent = data.message;
+                messageDiv.appendChild(newMessage);
+            } else if (data.type === 'connect_user' || data.type === 'disconnect_user') {
+                userlistDiv.innerHTML = '';
+                newMessage.textContent = data.new_user ? `${data.new_user}님이 입장했습니다.` : `${data.disconnected_user}님이 퇴장했습니다.`;
+                messageDiv.appendChild(newMessage);
+                const users = data.userlist;
+                users.forEach(function(user) {
+                    const userItem = document.createElement('div');
+                    userItem.textContent = user;
+                    userlistDiv.appendChild(userItem);
+                });
+
+                // 사용자 수에 따라 레디 버튼 처리
+                if (users.length < 3) {
+                    const existingButton = document.getElementById('readyButton');
+                    if (existingButton) {
+                        existingButton.remove();
+                    }
+                }
+            } else if (data.type === 'connection_refused') {
+                alert(data.message);
+                window.location.href = '/api/auth/test_home/';
+            } else if (data.type === 'full_room') {
+                // 게임스타트 버튼 생김 유저가 나가면 없어짐
+                let button = document.createElement('button');
+                button.textContent = '게임 레디';
+                button.id = 'readyButton';
+                button.onclick = function() {
+                    socket.send(JSON.stringify({
+                        'type': 'ready'
+                    }));
+					button.textContent = '준비완료';
+					button.disabled = true;
+                };
+                messageDiv.appendChild(button);
+            } else if (data.type === 'all_ready') {
+                // 백에 롤 요청
+                socket.send(JSON.stringify({
+                    'type': 'get_init_data'
+                }));
+            } else if (data.type === 'init_data'){
+                mySide = data.user_side;
+                left_user = data.left_user;
+                right_user = data.right_user;
+                startCountdown();
+            } else if (data.type === 'update_ball') {
+                ball.x = data.ball.x;
+                ball.y = data.ball.y;
+                drawGame();
+            } else if (data.type === 'update_score') {
+                scores = data.scores;
+                drawGame();
+            } else if (data.type === 'update_bar') {
+                leftBar.y = data.left_bar;
+                rightBar.y = data.right_bar;
+                drawGame();
+            } else if (data.type === 'user_out') {
+				alert(data.message);
+			} else if (data.type === 'game_end') {
+				alert(data.message);
+					
+			}
+        };
+
+        socket.onclose = function(e) {
+            console.log("웹소켓 서버와 연결이 끊어졌습니다.");
+        };
+
+        socket.onerror = function(e) {
+            console.error("웹소켓 에러 발생:", e);
+        };
+
+        function resizeCanvas() {
+            const size = Math.min(window.innerWidth, window.innerHeight) * 0.8;
+            gameCanvas.width = size;
+            gameCanvas.height = size;
+            drawGame();
+        }
+
+        function startCountdown() {
+            countdown = 3;
+            const countdownInterval = setInterval(() => {
+                drawGame(); // 카운트다운과 함께 게임 화면을 다시 그립니다.
+                countdown--;
+                if (countdown < 0) {
+                    clearInterval(countdownInterval);
+                    countdown = null; // 카운트다운 종료
+                    socket.send(JSON.stringify({
+                        'type': 'start_game'
+                    }));
+                }
+            }, 1000);
+        }
+
+        function drawGame() {
+            ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+            const scaleX = gameCanvas.width / 1000;
+            const scaleY = gameCanvas.height / 1000;
+
+            // 공 그리기
+            ctx.beginPath();
+            ctx.arc(ball.x * scaleX, ball.y * scaleY, ball.radius * scaleX, 0, Math.PI * 2);
+            ctx.fillStyle = 'blue';
+            ctx.fill();
+            ctx.closePath();
+
+            // 왼쪽 바 그리기
+            ctx.beginPath();
+            ctx.rect(20 * scaleX, leftBar.y * scaleY, 10 * scaleX, 100 * scaleY);
+            ctx.fillStyle = 'green';
+            ctx.fill();
+            ctx.closePath();
+
+            // 오른쪽 바 그리기
+            ctx.beginPath();
+            ctx.rect(970 * scaleX, rightBar.y * scaleY, 10 * scaleX, 100 * scaleY);
+            ctx.fillStyle = 'green';
+            ctx.fill();
+            ctx.closePath();
+
+            // 스코어 표시
+            ctx.font = `${24 * scaleX}px Arial`;
+            ctx.fillStyle = 'black';
+            ctx.fillText(`${left_user}: ${scores.left}`, 200 * scaleX, 20 * scaleY);
+            ctx.fillText(`${right_user}: ${scores.right}`, 700 * scaleX, 20 * scaleY);
+
+            // 카운트다운 표시
+            if (countdown !== null) {
+                ctx.font = `${72 * scaleX}px Arial`;
+                ctx.fillStyle = 'red';
+                ctx.fillText(countdown, gameCanvas.width / 2 - 20 * scaleX, gameCanvas.height / 2);
+            }
+        }
+
+        function handleKeyDown(event) {
+            if (event.key === 'ArrowUp') {
+                socket.send(JSON.stringify({
+                    'type': 'move_bar',
+                    'side': mySide,
+                    'direction': 'up'
+                }));
+            } else if (event.key === 'ArrowDown') {
+                socket.send(JSON.stringify({
+                    'type': 'move_bar',
+                    'side': mySide,
+                    'direction': 'down'
+                }));
+            }
+        }
+    </script>
+</body>
+</html>

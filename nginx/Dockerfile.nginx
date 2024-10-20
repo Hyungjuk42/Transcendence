@@ -1,0 +1,5 @@
+FROM    nginx:latest
+RUN     apt update && apt install openssl -y \
+        && openssl req -x509 -newkey rsa:2048 -nodes -keyout /etc/ssl/certs/nginx-selfsigned.key \
+        -out /etc/ssl/certs/nginx-selfsigned.crt -subj "/C=KR/ST=GEYOUNG-GI-DO/L=SEOUL/O=42SEOUL/OU=CARDET/CN=transcendence.42.fr"
+CMD     ["nginx", "-g", "daemon off;"]
